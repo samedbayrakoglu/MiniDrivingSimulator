@@ -11,14 +11,14 @@ class AWheeledVehiclePawn;
 class UChaosWheeledVehicleMovementComponent;
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class MINIDRIVINGSIMULATOR_API UVehicleTelemetryComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	UPROPERTY(BlueprintReadOnly)
-    FVehicleTelemetryData CurrentTelemetry;
+	FVehicleTelemetryData CurrentTelemetry;
 
 	// Sets default values for this component's properties
 	UVehicleTelemetryComponent();
@@ -27,13 +27,18 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+public:
+	// Called every frame
+	virtual void TickComponent(
+		float DeltaTime,
+		ELevelTick TickType,
+		FActorComponentTickFunction* ThisTickFunction
+	) override;
 
 private:
-    TObjectPtr<AWheeledVehiclePawn> Vehicle;	
+	TObjectPtr<AWheeledVehiclePawn> Vehicle;
 
 	TObjectPtr<UChaosWheeledVehicleMovementComponent> Movement;
-
-	FTimerHandle TelemetryTimerHandle;
 
 	void SampleTelemetry();
 };

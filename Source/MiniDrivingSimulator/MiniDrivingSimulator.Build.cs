@@ -17,7 +17,9 @@ public class MiniDrivingSimulator : ModuleRules
 			"ChaosVehicles",
 			"PhysicsCore",
 			"UMG",
-			"Slate"
+			"Slate",
+			"Sockets",
+			"Networking"
 		});
 
 		PublicIncludePaths.AddRange(new string[] {
