@@ -3,6 +3,7 @@
 #include "VehicleEventComponent.h"
 #include "WheeledVehiclePawn.h"
 #include "ChaosWheeledVehicleMovementComponent.h"
+#include "Components/PrimitiveComponent.h"
 
 // Sets default values for this component's properties
 UVehicleEventComponent::UVehicleEventComponent()
@@ -23,6 +24,18 @@ void UVehicleEventComponent::BeginPlay()
         Movement = Cast<UChaosWheeledVehicleMovementComponent>(
             Vehicle->GetVehicleMovementComponent()
         );
+
+        VehicleMesh = Vehicle->GetMesh();
+
+        if (VehicleMesh)
+        {
+            VehicleMesh->SetNotifyRigidBodyCollision(true);
+
+            VehicleMesh->OnComponentHit.AddDynamic(
+                this,
+                &UVehicleEventComponent::OnVehicleHit
+            );
+        }
     }
 }
 
@@ -56,7 +69,13 @@ void UVehicleEventComponent::CheckHardBraking(float DeltaTime)
     const float Acceleration =
         (CurrentSpeedMps - PreviousSpeedMps) / DeltaTime;
 
-    const bool bHardBrakingNow = Acceleration < -8.0f;
+    const bool bBrakeInput =
+        Movement->GetBrakeInput() > 0.1f ||
+        Movement->GetHandbrakeInput() > 0.1f;
+
+    const bool bHardBrakingNow =
+        bBrakeInput &&
+        Acceleration < -8.0f;
 
     if (bHardBrakingNow && !bIsHardBraking)
     {
@@ -72,5 +91,59 @@ void UVehicleEventComponent::CheckHardBraking(float DeltaTime)
     }
 
     bIsHardBraking = bHardBrakingNow;
-    PreviousSpeed = CurrentSpeed;
+}
+
+
+// Collision detection
+void UVehicleEventComponent::OnVehicleHit(
+    UPrimitiveComponent* HitComponent,
+    AActor* OtherActor,
+    UPrimitiveComponent* OtherComp,
+    FVector NormalImpulse,
+    const FHitResult& Hit)
+{
+    if (!OtherActor || OtherActor == GetOwner())
+    {
+        return;
+    }
+
+    const float ImpactStrength = NormalImpulse.Size();
+
+    // Start a short cooldown window for this collision.
+    if (!GetWorld()->GetTimerManager().IsTimerActive(CollisionTimerHandle))
+    {
+        HighestCollisionImpact = ImpactStrength;
+
+        GetWorld()->GetTimerManager().SetTimer(
+            CollisionTimerHandle,
+            this,
+            &UVehicleEventComponent::LogCollisionEvent,
+            0.5f,
+            false
+        );
+    }
+    else
+    {
+        HighestCollisionImpact = FMath::Max(
+            HighestCollisionImpact,
+            ImpactStrength
+        );
+    }
+}
+
+
+// Log the strongest impact after the collision window
+void UVehicleEventComponent::LogCollisionEvent()
+{
+    const FDateTime Timestamp = FDateTime::Now();
+
+    UE_LOG(
+        LogTemp,
+        Warning,
+        TEXT("[%s] COLLISION EVENT! Highest Impact Strength: %.2f"),
+        *Timestamp.ToString(TEXT("%Y-%m-%d %H:%M:%S.%s")),
+        HighestCollisionImpact
+    );
+
+    HighestCollisionImpact = 0.0f;
 }

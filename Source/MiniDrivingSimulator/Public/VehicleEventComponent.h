@@ -8,33 +8,52 @@
 
 class AWheeledVehiclePawn;
 class UChaosWheeledVehicleMovementComponent;
+class UPrimitiveComponent;
 
-
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class MINIDRIVINGSIMULATOR_API UVehicleEventComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
-	// Sets default values for this component's properties
+public:
+	// Sets default values for this component
 	UVehicleEventComponent();
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void TickComponent(
+		float DeltaTime,
+		ELevelTick TickType,
+		FActorComponentTickFunction* ThisTickFunction
+	) override;
 
 private:
 
 	TObjectPtr<AWheeledVehiclePawn> Vehicle;
 	TObjectPtr<UChaosWheeledVehicleMovementComponent> Movement;
+	TObjectPtr<UPrimitiveComponent> VehicleMesh;
 
 	float PreviousSpeed = 0.0f;
 	bool bIsHardBraking = false;
 
 	void CheckHardBraking(float DeltaTime);
 	void CheckCollision();
+
+	UFUNCTION()
+	void OnVehicleHit(
+		UPrimitiveComponent* HitComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		FVector NormalImpulse,
+		const FHitResult& Hit
+	);
+
+	FTimerHandle CollisionTimerHandle;
+	float HighestCollisionImpact = 0.0f;
+
+	void LogCollisionEvent();
 };
