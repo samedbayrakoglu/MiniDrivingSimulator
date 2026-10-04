@@ -69,13 +69,13 @@ void UVehicleTelemetryComponent::SampleTelemetry()
 	CurrentTelemetry.Brake =
 		Movement->GetBrakeInput();
 
-	UE_LOG(LogTemp, Warning, TEXT("Telemetry Speed: %f"), CurrentTelemetry.Speed);
-	UE_LOG(LogTemp, Warning, TEXT("Telemetry rpm: %f"), CurrentTelemetry.RPM);
-	UE_LOG(LogTemp, Warning, TEXT("Telemetry Pos: X=%f Y=%f Z=%f"),
-		CurrentTelemetry.WorldPosition.X,
-		CurrentTelemetry.WorldPosition.Y,
-		CurrentTelemetry.WorldPosition.Z);
-	UE_LOG(LogTemp, Warning, TEXT("Telemetry Steering: %f"), CurrentTelemetry.SteeringAngle);
-	UE_LOG(LogTemp, Warning, TEXT("Telemetry Throttle: %f"), CurrentTelemetry.Throttle);
-	UE_LOG(LogTemp, Warning, TEXT("Telemetry Brake: %f"), CurrentTelemetry.Brake);
+	// UE_LOG(LogTemp, Warning, TEXT("Telemetry Speed: %f"), CurrentTelemetry.Speed);
+	// UE_LOG(LogTemp, Warning, TEXT("Telemetry rpm: %f"), CurrentTelemetry.RPM);
+	// UE_LOG(LogTemp, Warning, TEXT("Telemetry Pos: X=%f Y=%f Z=%f"),
+	// 	CurrentTelemetry.WorldPosition.X,
+	// 	CurrentTelemetry.WorldPosition.Y,
+	// 	CurrentTelemetry.WorldPosition.Z);
+	// UE_LOG(LogTemp, Warning, TEXT("Telemetry Steering: %f"), CurrentTelemetry.SteeringAngle);
+	// UE_LOG(LogTemp, Warning, TEXT("Telemetry Throttle: %f"), CurrentTelemetry.Throttle);
+	// UE_LOG(LogTemp, Warning, TEXT("Telemetry Brake: %f"), CurrentTelemetry.Brake);
 }
