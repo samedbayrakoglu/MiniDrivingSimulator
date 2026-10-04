@@ -73,7 +73,11 @@ void UVehicleEventComponent::CheckHardBraking(float DeltaTime)
         Movement->GetBrakeInput() > 0.1f ||
         Movement->GetHandbrakeInput() > 0.1f;
 
+    // Only detect hard braking while moving forward.
+    const bool bMovingForward = CurrentSpeed > 50.0f;
+
     const bool bHardBrakingNow =
+        bMovingForward &&
         bBrakeInput &&
         Acceleration < -8.0f;
 
@@ -91,6 +95,8 @@ void UVehicleEventComponent::CheckHardBraking(float DeltaTime)
     }
 
     bIsHardBraking = bHardBrakingNow;
+
+    PreviousSpeed = CurrentSpeed;
 }
 
 
