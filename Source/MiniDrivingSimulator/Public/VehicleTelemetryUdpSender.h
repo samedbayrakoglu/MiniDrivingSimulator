@@ -22,10 +22,6 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
 private:
 
 	TObjectPtr<UVehicleTelemetryComponent> TelemetryComponent;
@@ -35,4 +31,6 @@ private:
 	void SendTelemetry();
 
 	FSocket* Socket = nullptr;
+
+	uint32 SequenceNumber = 0;
 };

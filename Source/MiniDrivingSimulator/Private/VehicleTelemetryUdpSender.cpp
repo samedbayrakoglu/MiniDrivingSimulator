@@ -12,11 +12,6 @@
 // Sets default values for this component's properties
 UVehicleTelemetryUdpSender::UVehicleTelemetryUdpSender()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
 }
 
 
@@ -30,8 +25,7 @@ void UVehicleTelemetryUdpSender::BeginPlay()
 	// handle socket
 	Socket = FUdpSocketBuilder(TEXT("VehicleTelemetrySocket"))
 		.AsReusable()
-		.AsNonBlocking()
-		.WithBroadcast();
+		.AsNonBlocking();
 
 	TelemetryComponent = GetOwner()->FindComponentByClass<UVehicleTelemetryComponent>();
 
@@ -46,15 +40,6 @@ void UVehicleTelemetryUdpSender::BeginPlay()
 	
 }
 
-
-// Called every frame
-void UVehicleTelemetryUdpSender::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
-}
-
 void UVehicleTelemetryUdpSender::SendTelemetry()
 {
 	if (!Socket || !TelemetryComponent)
@@ -65,9 +50,14 @@ void UVehicleTelemetryUdpSender::SendTelemetry()
 	const FVehicleTelemetryData& Data = TelemetryComponent->CurrentTelemetry;
 
 	TArray<uint8> Packet;
-	Packet.SetNumUninitialized(sizeof(float) * 8);
+	Packet.SetNumUninitialized(sizeof(uint32) + sizeof(float) * 8);
 
-	float* Buffer = reinterpret_cast<float*>(Packet.GetData());
+	uint32* SequenceBuffer = reinterpret_cast<uint32*>(Packet.GetData());
+	*SequenceBuffer = SequenceNumber++;
+
+	float* Buffer = reinterpret_cast<float*>(
+		Packet.GetData() + sizeof(uint32)
+	);
 
 	Buffer[0] = Data.Speed;
 	Buffer[1] = Data.RPM;
